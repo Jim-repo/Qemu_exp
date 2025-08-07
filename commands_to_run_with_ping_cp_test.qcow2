@@ -26,7 +26,38 @@ sudo qemu-system-x86_64 \
 
 # in guest machine ip a --> 192.168.122.235/24 eth0
 
+Solution for not able to port forward for ssh
 
+# Remember to run the sudo ip link set tap0 up and sudo ip link set tap0 master virbr0 commands in another terminal to connect it to the bridge.
+# 
+# Once the VM boots, log in and find its IP address:
+# 
+# # Inside the Alpine VM
+# 
+# ip a
+# 
+# Look for the eth0 interface. You'll see its IP address, something like 192.168.122.123.
+# 
+# Step 2: Set up Port Forwarding with socat Now, on your host Ubuntu terminal, install a powerful utility called socat and run the forwarding command.
+# 
+# # On the host machine
+# 
+# sudo apt update
+# 
+# sudo apt install socat
+# 
+# # Forward host port 2222 to your VM's IP on port 22
+# 
+# # Replace 192.168.122.123 with your VM's actual IP
+# 
+# sudo socat TCP-LISTEN:2222,fork TCP:192.168.122.123:22
+# 
+# This command tells your host: "Listen for any TCP connection on port 2222. When you get one, immediately forward it to port 22 on the VM at 192.168.122.123." Leave this command running.
+# 
+# Step 3: Connect via SSH From a third host terminal, you can now SSH exactly as you wanted:
+# 
+# ssh root@localhost -p 2222
+# 
 #qemu-system-x86_64 \
 #  -enable-kvm \
 #  -m 1024 \
@@ -36,3 +67,4 @@ sudo qemu-system-x86_64 \
 #  -device virtio-net-pci,netdev=net0 \
 #  -boot order=c 
 #  -nographic
+
