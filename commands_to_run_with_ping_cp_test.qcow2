@@ -1,0 +1,38 @@
+#nstallation with virt manager, open with qemu command below
+#ssh root@localhost -p 2222 will work (host terminal)
+#ping -c4 google.com will also work (in the qemu machine)
+sudo qemu-system-x86_64 \
+  -enable-kvm \
+  -m 1024 \
+  -cpu host \
+  -M q35 \
+  -smp 1 \
+  -drive file=./test.qcow2,if=virtio,format=qcow2,discard=unmap \
+  -netdev tap,id=net0,ifname=tap0,script=no,downscript=no \
+  -device virtio-net-pci,netdev=net0,mac=52:54:00:84:b3:72 \
+  -nographic
+
+# open a new host terminal
+# $ ip a | grep virbr
+#4: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
+#   inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
+# $ sudo ip link set tap0 up
+# [sudo] password for aj:     
+# $ sudo ip link set tap0 master virbr0
+
+# ip a | grep virbr
+# sudo ip link set tap0 up
+# sudo ip link set tap0 master virbr0
+
+# in guest machine ip a --> 192.168.122.235/24 eth0
+
+
+#qemu-system-x86_64 \
+#  -enable-kvm \
+#  -m 1024 \
+#  -drive file=./test.qcow2,format=qcow2,if=virtio 
+#  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
+#  -device virtio-net-pci,netdev=net0,mac=52:54:00:84:b3:72 \  
+#  -device virtio-net-pci,netdev=net0 \
+#  -boot order=c 
+#  -nographic
